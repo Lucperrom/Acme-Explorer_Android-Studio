@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Esta línea permite acceso a los archivos en getExternalFilesDir(Environment.DIRECTORY_PICTURES) -->
+    <external-files-path name="my_images" path="Pictures/" />
+    <external-files-path name="acme_photos" path="Pictures/acmeexplorer/" />
+</paths>

@@ -3,10 +3,14 @@ package com.example.entregable1;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -15,6 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.entregable1.entity.Filtro;
 import com.example.entregable1.entity.Trip;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -24,8 +33,9 @@ import java.util.List;
 
 public class ListadoTripActivity extends AppCompatActivity implements TripAdapter.OnTripClickListener {
     Filtro filtro = new Filtro(); // Inicialización por defecto
-    List<Trip> todosLosViajes;
-    List<Trip> viajesFiltrados;
+    List<Trip> todosLosViajes = new ArrayList<>();
+    List<Trip> viajesFiltrados = new ArrayList<>();;
+
 
     RecyclerView rvTrips;
     TripAdapter adapter;
@@ -34,6 +44,8 @@ public class ListadoTripActivity extends AppCompatActivity implements TripAdapte
     CardView cardFiltrar;
 
     ActivityResultLauncher<Intent> filtroLauncher;
+
+    private FirebaseDatabaseService firebaseDatabaseService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +58,69 @@ public class ListadoTripActivity extends AppCompatActivity implements TripAdapte
 
         // Cargar viajes desde SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(SplashActivity.PREF_NAME, MODE_PRIVATE);
-        String json = sharedPreferences.getString(SplashActivity.VIAJES_KEY, null);
+        firebaseDatabaseService = FirebaseDatabaseService.getServiceInstance();
 
-        if (json != null) {
+        firebaseDatabaseService.getTrip().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    todosLosViajes.clear(); // Limpia la lista por si acaso
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Trip trip = snapshot.getValue(Trip.class);
+                        if (trip != null) {
+                            todosLosViajes.add(trip);
+                        }
+                    }
+                    Log.i("Acme-Explorer", "Se han recuperado todos los viajes. Total: " + todosLosViajes.size());
+
+                    // Inicializa y configura el adaptador AQUÍ, después de recibir los datos
+                    viajesFiltrados = new ArrayList<>(todosLosViajes);
+                    adapter = new TripAdapter(viajesFiltrados, ListadoTripActivity.this);
+                    rvTrips.setAdapter(adapter);
+                    rvTrips.setLayoutManager(new LinearLayoutManager(ListadoTripActivity.this));
+
+                    recargarSelecciones();
+                    aplicarFiltros();
+
+                    // Verificar si se solicitó el filtro de seleccionados (ahora que tenemos los datos)
+                    if (getIntent().getBooleanExtra("FILTRO_SELECCIONADOS", false)) {
+                        filtro.setSelected(true);
+                        aplicarFiltros();
+                    } else {
+                        aplicarFiltros(); // Aplicar filtros iniciales si no hay filtro de seleccionados
+                    }
+
+                    // Cambio de columnas (la lógica puede quedarse aquí)
+                    switchColumnas.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                        if (isChecked) {
+                            rvTrips.setLayoutManager(new GridLayoutManager(ListadoTripActivity.this, 2));
+                        } else {
+                            rvTrips.setLayoutManager(new LinearLayoutManager(ListadoTripActivity.this));
+                        }
+                    });
+
+                } else {
+                    Log.i("Acme-Explorer", "No se encontraron viajes en la base de datos.");
+                    viajesFiltrados = new ArrayList<>(); // Inicializa una lista vacía
+                    adapter = new TripAdapter(viajesFiltrados, ListadoTripActivity.this);
+                    rvTrips.setAdapter(adapter);
+                    rvTrips.setLayoutManager(new LinearLayoutManager(ListadoTripActivity.this));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Acme-Explorer", "Error al leer los viajes: " + databaseError.getMessage());
+                viajesFiltrados = new ArrayList<>(); // Inicializa una lista vacía en caso de error
+                adapter = new TripAdapter(viajesFiltrados, ListadoTripActivity.this);
+                rvTrips.setAdapter(adapter);
+                rvTrips.setLayoutManager(new LinearLayoutManager(ListadoTripActivity.this));
+            }
+        });
+
+        //String json = sharedPreferences.getString(SplashActivity.VIAJES_KEY, null);
+
+      /*  if (json != null) {
             Gson gson = new Gson();
             Type tipoLista = new TypeToken<List<Trip>>() {}.getType();
             todosLosViajes = gson.fromJson(json, tipoLista);
@@ -57,28 +129,7 @@ public class ListadoTripActivity extends AppCompatActivity implements TripAdapte
             recargarSelecciones();
         } else {
             todosLosViajes = new ArrayList<>();
-        }
-
-        viajesFiltrados = new ArrayList<>(todosLosViajes);
-
-        // Verificar si se solicitó el filtro de seleccionados
-        if (getIntent().getBooleanExtra("FILTRO_SELECCIONADOS", false)) {
-            filtro.setSelected(true);
-            aplicarFiltros(); // Usamos el método general de aplicar filtros
-        }
-
-        adapter = new TripAdapter(viajesFiltrados, this);
-        rvTrips.setAdapter(adapter);
-        rvTrips.setLayoutManager(new LinearLayoutManager(this));
-
-        // Cambio de columnas
-        switchColumnas.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                rvTrips.setLayoutManager(new GridLayoutManager(this, 2));
-            } else {
-                rvTrips.setLayoutManager(new LinearLayoutManager(this));
-            }
-        });
+        }*/
 
         // Lanzador de filtros con resultado
         filtroLauncher = registerForActivityResult(
@@ -120,7 +171,10 @@ public class ListadoTripActivity extends AppCompatActivity implements TripAdapte
             }
         }
 
-        // No es necesario actualizar viajesFiltrados aquí ya que aplicarFiltros() lo rehará
+        // Después de actualizar la lista, necesitas notificar al adapter que los datos han cambiado
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void aplicarFiltros() {
@@ -152,8 +206,8 @@ public class ListadoTripActivity extends AppCompatActivity implements TripAdapte
             long finFiltro = filtro.getFechaFin().getTimeInMillis();
 
             resultadoFiltrado.removeIf(trip -> {
-                long salida = trip.getFechaSalida().getTimeInMillis();
-                long llegada = trip.getFechaLlegada().getTimeInMillis();
+                long salida = trip.getFechaSalida().getTime();
+                long llegada = trip.getFechaLlegada().getTime();
                 return salida < inicioFiltro || llegada > finFiltro;
             });
         }

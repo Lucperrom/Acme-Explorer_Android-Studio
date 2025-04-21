@@ -7,9 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.entregable1.entity.Enlace;
 
 
@@ -18,27 +21,53 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.example.entregable1.entity.Enlace;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
 public class DisponibleSeleccionado extends AppCompatActivity {
     GridView gridView;
     EnlaceAdapter enlaceAdapter;
+    Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enlace_adapter);
 
-        gridView=findViewById(R.id.gridView);
+        gridView = findViewById(R.id.gridView);
         gridView.setNumColumns(1);
-        EnlaceAdapter enlaceAdapter=new EnlaceAdapter(Enlace.generaEnlaces(),this);
+        EnlaceAdapter enlaceAdapter = new EnlaceAdapter(Enlace.generaEnlaces(), this);
         gridView.setAdapter(enlaceAdapter);
+        logoutButton = findViewById(R.id.login_button_register);
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            logoutButton.setVisibility(View.GONE);
+        }else{
+            logoutButton.setVisibility(View.VISIBLE);
+        }
+
+        logoutButton.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            Task<Void> voidTask = Tasks.forResult(null);
+            voidTask.addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
+                    enlaceAdapter.notifyDataSetChanged();
+                    enlaceAdapter.enlaces = Enlace.generaEnlaces();
+                    logoutButton.setVisibility(View.GONE);
+                } else {
+                    Toast.makeText(this, "Error al cerrar sesión", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 }
 class EnlaceAdapter extends BaseAdapter {
 
-    List<Enlace> enlaces;
+    public List<Enlace> enlaces;
     Context context;
 
     public EnlaceAdapter(List<Enlace> enlaces, Context context) {

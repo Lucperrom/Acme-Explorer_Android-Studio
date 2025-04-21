@@ -9,23 +9,36 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.entregable1.entity.Trip;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
+public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> implements EventListener<QuerySnapshot> {
 
     private List<Trip> mTrips;
+
     private OnTripClickListener mListener;
 
     public TripAdapter(List<Trip> trips, OnTripClickListener listener){
         mTrips = trips;
         mListener = listener;
+    }
+
+    @Override
+    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+
     }
 
     public interface OnTripClickListener {

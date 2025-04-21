@@ -4,23 +4,27 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.example.entregable1.Constantes;
+import com.google.firebase.database.Exclude;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Trip implements Parcelable {
     private String LugarSalida, LugarDestino, Descripcion, Url, Codigo;
-    private int Precio;
-    private Calendar FechaSalida, FechaLlegada;
-
+    private double Precio; // Imprescindible para coincidir con el JSON
+    private Date FechaSalida, FechaLlegada; // Imprescindible: Calendar no es instanciable
     private Boolean selected;
 
     public Trip() {
     }
 
-    public Trip(String lugarSalida, String lugarDestino, String descripcion, String url, int precio, Calendar fechaSalida, Calendar fechaLlegada, String codigo) {
+    public Trip(String lugarSalida, String lugarDestino, String descripcion, String url, double precio, Date fechaSalida, Date fechaLlegada, String codigo) {
         LugarSalida = lugarSalida;
         LugarDestino = lugarDestino;
         Descripcion = descripcion;
@@ -31,7 +35,7 @@ public class Trip implements Parcelable {
         Codigo = codigo;
     }
 
-    public Trip(String lugarSalida, String lugarDestino, String descripcion, int precio, String url) {
+    public Trip(String lugarSalida, String lugarDestino, String descripcion, double precio, String url) {
         LugarSalida = lugarSalida;
         LugarDestino = lugarDestino;
         Descripcion = descripcion;
@@ -44,14 +48,12 @@ public class Trip implements Parcelable {
         LugarDestino = in.readString();
         Descripcion = in.readString();
         Url = in.readString();
-        Precio = in.readInt();
+        Precio = in.readDouble();
         selected = in.readBoolean();
-
-        FechaSalida = Calendar.getInstance();
-        FechaSalida.setTimeInMillis(in.readLong());
-
-        FechaLlegada = Calendar.getInstance();
-        FechaLlegada.setTimeInMillis(in.readLong());
+        long fechaSalidaMillis = in.readLong();
+        FechaSalida = fechaSalidaMillis == 0 ? null : new Date(fechaSalidaMillis);
+        long fechaLlegadaMillis = in.readLong();
+        FechaLlegada = fechaLlegadaMillis == 0 ? null : new Date(fechaLlegadaMillis);
         Codigo = in.readString();
     }
 
@@ -68,13 +70,17 @@ public class Trip implements Parcelable {
     };
 
     public static List<Trip> generaViajes(int tam) {
+
         int numRandom, minRandom = 0, maxRandom = Constantes.ciudades.length;
         int maxSalidas = Constantes.lugarSalida.length;
         int numRandomImage, minRandomImage = 0, maxRandomImage = Constantes.urlImagenes.length;
 
         List<Trip> viajes = new ArrayList<>();
+
         for (int i = 0; i < tam; i++) {
+
             int precio = ThreadLocalRandom.current().nextInt(10, 1000);
+
             numRandom = ThreadLocalRandom.current().nextInt(minRandom, maxRandom);
             numRandomImage = ThreadLocalRandom.current().nextInt(minRandomImage, maxRandomImage);
 
@@ -82,38 +88,46 @@ public class Trip implements Parcelable {
             String image = Constantes.urlImagenes[numRandomImage];
             String salida = Constantes.lugarSalida[i % maxSalidas];
 
-            Calendar fechaSalida = Calendar.getInstance();
-            Calendar fechaLlegada = Calendar.getInstance();
-
-            int dayOfYear = ThreadLocalRandom.current().nextInt(1, fechaSalida.getActualMaximum(Calendar.DAY_OF_YEAR) + 1);
-            fechaSalida.set(Calendar.YEAR, 2025);
-            fechaSalida.set(Calendar.DAY_OF_YEAR, dayOfYear);
-            fechaSalida.set(Calendar.HOUR_OF_DAY, 0);
-            fechaSalida.set(Calendar.MINUTE, 0);
-            fechaSalida.set(Calendar.SECOND, 0);
-
-            int duracionDias = ThreadLocalRandom.current().nextInt(1, 15);
-            fechaLlegada.setTimeInMillis(fechaSalida.getTimeInMillis());
-            fechaLlegada.add(Calendar.DAY_OF_YEAR, duracionDias);
-
             Trip trip = new Trip(salida, ciudad, "Viaje desde " + salida + " hasta " + ciudad, precio, image);
-            trip.setFechaSalida(fechaSalida);
-            trip.setFechaLlegada(fechaLlegada);
+
+            trip.setFechaSalida(generarFechaFuturaAleatoriaDate());
+            trip.setFechaLlegada(generarFechaFuturaAleatoriaDate());
+
             trip.setSelected(false);
+
             int randomCode = ThreadLocalRandom.current().nextInt(1000, 10000); // Generate random 4-digit number
             trip.setCodigo("TRP-" + randomCode);
 
             viajes.add(trip);
-        }
 
+        }
         return viajes;
+
     }
 
-    public int getPrecio() {
+    public static Date generarFechaFuturaAleatoriaDate() {
+        LocalDate fechaActualLocal = LocalDate.now();
+        Random random = new Random();
+
+        // Genera un número aleatorio de días en el futuro (por ejemplo, hasta 365 días)
+        int diasEnElFuturo = random.nextInt(365) + 1;
+
+        LocalDate fechaFuturaLocal = fechaActualLocal.plusDays(diasEnElFuturo);
+
+        // Convierte LocalDate a Date
+        return Date.from(fechaFuturaLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static void main(String[] args) {
+        Date fechaFuturaDate = generarFechaFuturaAleatoriaDate();
+        System.out.println("Fecha futura aleatoria generada (Date): " + fechaFuturaDate);
+    }
+
+    public double getPrecio() {
         return Precio;
     }
 
-    public void setPrecio(int precio) {
+    public void setPrecio(double precio) {
         Precio = precio;
     }
 
@@ -149,19 +163,19 @@ public class Trip implements Parcelable {
         Url = url;
     }
 
-    public Calendar getFechaSalida() {
+    public Date getFechaSalida() {
         return FechaSalida;
     }
 
-    public void setFechaSalida(Calendar fechaSalida) {
+    public void setFechaSalida(Date fechaSalida) {
         FechaSalida = fechaSalida;
     }
 
-    public Calendar getFechaLlegada() {
+    public Date getFechaLlegada() {
         return FechaLlegada;
     }
 
-    public void setFechaLlegada(Calendar fechaLlegada) {
+    public void setFechaLlegada(Date fechaLlegada) {
         FechaLlegada = fechaLlegada;
     }
 
@@ -181,6 +195,12 @@ public class Trip implements Parcelable {
         Codigo = codigo;
     }
 
+    @Exclude
+    public int getStability() {
+        return 0;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -192,12 +212,11 @@ public class Trip implements Parcelable {
         parcel.writeString(LugarDestino);
         parcel.writeString(Descripcion);
         parcel.writeString(Url);
-        parcel.writeInt(Precio);
+        parcel.writeDouble(Precio);
         parcel.writeBoolean(selected);
-        parcel.writeLong(FechaSalida.getTimeInMillis());
-        parcel.writeLong(FechaLlegada.getTimeInMillis());
+        parcel.writeLong(FechaSalida == null ? 0 : FechaSalida.getTime());
+        parcel.writeLong(FechaLlegada == null ? 0 : FechaLlegada.getTime());
         parcel.writeString(Codigo);
-
     }
 
     @Override
@@ -213,5 +232,18 @@ public class Trip implements Parcelable {
                 ", selected=" + selected +
                 ", Codigo='" + Codigo + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trip trip = (Trip) o;
+        return Double.compare(trip.Precio, Precio) == 0 && Objects.equals(LugarSalida, trip.LugarSalida) && Objects.equals(LugarDestino, trip.LugarDestino) && Objects.equals(Descripcion, trip.Descripcion) && Objects.equals(Url, trip.Url) && Objects.equals(Codigo, trip.Codigo) && Objects.equals(FechaSalida, trip.FechaSalida) && Objects.equals(FechaLlegada, trip.FechaLlegada) && Objects.equals(selected, trip.selected);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(LugarSalida, LugarDestino, Descripcion, Url, Codigo, Precio, FechaSalida, FechaLlegada, selected);
     }
 }

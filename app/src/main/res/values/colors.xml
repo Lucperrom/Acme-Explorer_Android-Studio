@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue_button">#365FF4</color>
+    <color name="red_google">#D0372D</color>
+    <color name="blue_app">#3C36F4</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="purple_500">#E869DC</color>
 </resources>

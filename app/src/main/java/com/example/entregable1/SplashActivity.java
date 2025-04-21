@@ -4,10 +4,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.entregable1.entity.Trip;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,17 +34,18 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-
+        todosLosViajes = Trip.generaViajes(1);
+        guardarViajesEnRealTimeDatabase(todosLosViajes);
         // Solo generar y guardar si no está guardado aún
-        if (!sharedPreferences.contains(VIAJES_KEY)) {
-            todosLosViajes = Trip.generaViajes(100);
+       /* if (!sharedPreferences.contains(VIAJES_KEY)) {
             guardarViajesEnSharedPreferences(todosLosViajes);
         } else {
             todosLosViajes = obtenerViajesDeSharedPreferences();
-        }
+        }*/
 
         new Handler().postDelayed(() -> {
             startActivity(new Intent(SplashActivity.this, DisponibleSeleccionado.class));
+            finish();
         }, DURACION);
     }
 
@@ -54,5 +60,21 @@ public class SplashActivity extends AppCompatActivity {
         String json = sharedPreferences.getString(VIAJES_KEY, null);
         Type tipoLista = new TypeToken<List<Trip>>() {}.getType();
         return gson.fromJson(json, tipoLista);
+    }
+
+    private void guardarViajesEnRealTimeDatabase(List<Trip> viajes) {
+        FirebaseDatabaseService firebaseDatabaseService = FirebaseDatabaseService.getServiceInstance();
+        for (Trip viaje : viajes) {
+            firebaseDatabaseService.saveTrip(viaje, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        Log.i("Acme-Explorer", "Trip insertado");
+                    } else {
+                        Log.i("Acme-Explorer", "Error al insertar Trip." + databaseError.getMessage());
+                    }
+                }
+            });
+        }
     }
 }

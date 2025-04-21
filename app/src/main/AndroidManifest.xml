@@ -4,6 +4,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <!-- Permisos de almacenamiento (solo para Android 9 y anteriores) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,6 +21,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Entregable1"
         tools:targetApi="31">
+        <activity
+            android:name=".CameraActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AuthActivity"
+            android:exported="false" />
         <activity
             android:name=".TripDetailActivity"
             android:exported="false" />
@@ -44,6 +63,18 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.entregable1.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
+
+
 
 </manifest>
