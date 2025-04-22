@@ -3,6 +3,7 @@ package com.example.entregable1;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,6 +29,7 @@ public class TripDetailActivity extends AppCompatActivity {
     ImageView ivTripImage;
 
     ImageButton btSelected;
+    Button btBuy, btMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,14 @@ public class TripDetailActivity extends AppCompatActivity {
         tvFechaLlegada = findViewById(R.id.textLlegada);
         ivTripImage = findViewById(R.id.imageTripDetail);
         btSelected = findViewById(R.id.btSelected);
+        btMap = findViewById(R.id.buttonMap);
+
+        btMap.setOnClickListener(v -> {
+            //Intent intent = new Intent(this, MapsActivity.class);
+            Intent intent = new Intent(this, LocationActivity.class);
+            intent.putExtra("SALIDA", trip.getLugarSalida());
+            startActivity(intent);
+        });
 
         trip = getIntent().getParcelableExtra("TRIP_OBJECT");
 

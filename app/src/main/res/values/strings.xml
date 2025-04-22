@@ -37,4 +37,9 @@
     <string name="upload_failed">Error al subir la imagen.</string>
     <string name="camera_permission_required">Se requiere permiso de la cámara para continuar.</string>
     <string name="storage_permission_required">Se requiere permiso de almacenamiento para guardar la foto.</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="location_rationale">Necesitamos tu localización para esta funcionalidad</string>
+    <string name="location_rationale_ok">Permitir</string>
+    <string name="location_cancel">Este permiso es necesario para la aplicación</string>
+    <string name="open_weather_map_api_key">be61475ecbee33779ac3cda7a7aa282b</string>
 </resources>

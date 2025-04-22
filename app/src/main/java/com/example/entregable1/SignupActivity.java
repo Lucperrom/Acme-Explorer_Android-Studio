@@ -3,6 +3,7 @@ package com.example.entregable1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -17,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class SignupActivity extends AppCompatActivity {
 
     public static final String EMAIL_PARAM ="email_parameter";
-    private AutoCompleteTextView login_email_et, login_pass_et, login_pass_confirmation_et;
+    private EditText login_email_et, login_pass_et, login_pass_confirmation_et;
 
     private TextInputLayout login_email, login_pass, login_pass_confirmation;
 
@@ -28,9 +29,9 @@ public class SignupActivity extends AppCompatActivity {
 
         String emailParam = getIntent().getStringExtra(EMAIL_PARAM);
 
-        login_email_et = (AutoCompleteTextView) findViewById(R.id.login_email_et);
-        login_pass_et = (AutoCompleteTextView) findViewById(R.id.login_pass_et);
-        login_pass_confirmation_et = (AutoCompleteTextView) findViewById(R.id.login_pass_confirmation_et);
+        login_email_et = findViewById(R.id.login_email_et);
+        login_pass_et = findViewById(R.id.login_pass_et);
+        login_pass_confirmation_et = findViewById(R.id.login_pass_confirmation_et);
         login_email = (TextInputLayout) findViewById(R.id.login_email);
         login_pass = (TextInputLayout) findViewById(R.id.login_pass);
         login_pass_confirmation = (TextInputLayout) findViewById(R.id.login_pass_confirmation);

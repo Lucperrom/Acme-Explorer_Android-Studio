@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
 android {
@@ -30,6 +31,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -52,4 +56,11 @@ dependencies {
     implementation("com.google.firebase:firebase-core:17.3.0")
     implementation("com.google.firebase:firebase-firestore:21.4.2")
     implementation("com.google.firebase:firebase-storage:20.0.0")
+    implementation("com.google.android.gms:play-services-maps:18.0.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.paypal.sdk:paypal-android-sdk:2.16.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }

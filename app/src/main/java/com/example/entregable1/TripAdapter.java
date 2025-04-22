@@ -36,6 +36,10 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> im
         mListener = listener;
     }
 
+    public TripAdapter(){
+
+    }
+
     @Override
     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 

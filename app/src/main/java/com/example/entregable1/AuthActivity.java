@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -58,7 +57,6 @@ public class AuthActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button signinButtonGoogle, siginButtonMail, loginButtonSingUp;
     private TextInputLayout loginEmailParent, loginPassParent;
-    private ProgressBar progressBar;
     private AutoCompleteTextView loginEmail, loginPass;
     private ValueEventListener valueEventListener;
     private FirebaseDatabaseService firebaseDatabaseService;
@@ -72,7 +70,6 @@ public class AuthActivity extends AppCompatActivity {
         signinButtonGoogle = (Button) findViewById(R.id.login_button_google);
         siginButtonMail = (Button) findViewById(R.id.login_button_mail);
         loginButtonSingUp = (Button) findViewById(R.id.login_button_register);
-        progressBar = (ProgressBar) findViewById(R.id.login_progress);
         loginEmail = (AutoCompleteTextView) findViewById(R.id.login_email_et);
         loginPass = (AutoCompleteTextView) findViewById(R.id.login_pass_et);
         loginEmailParent = (TextInputLayout) findViewById(R.id.login_email);
@@ -296,7 +293,6 @@ public class AuthActivity extends AppCompatActivity {
 
         if(hide){
             TransitionManager.beginDelayedTransition(findViewById(R.id.login_main_layout), transitionSet);
-            progressBar.setVisibility(View.VISIBLE);
             signinButtonGoogle.setVisibility(View.GONE);
             siginButtonMail.setVisibility(View.GONE);
             loginButtonSingUp.setVisibility(View.GONE);
@@ -304,7 +300,6 @@ public class AuthActivity extends AppCompatActivity {
             loginPassParent.setEnabled(false);
         }else{
             TransitionManager.beginDelayedTransition(findViewById(R.id.login_main_layout), transitionSet);
-            progressBar.setVisibility(View.GONE);
             signinButtonGoogle.setVisibility(View.VISIBLE);
             siginButtonMail.setVisibility(View.VISIBLE);
             loginButtonSingUp.setVisibility(View.VISIBLE);
