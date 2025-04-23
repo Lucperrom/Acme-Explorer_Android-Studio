@@ -133,18 +133,20 @@
         android:layout_width="45dp"
         android:layout_height="47dp"
         android:layout_marginTop="28dp"
-        android:layout_marginEnd="124dp"
+        android:layout_marginEnd="88dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textLugarSalida"
         app:srcCompat="@android:drawable/btn_star_big_off" />
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnPayWithPaypal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="88dp"
-        android:layout_marginBottom="80dp"
-        android:text="Comprar"
+        android:layout_margin="16dp"
+        android:background="@drawable/paypal_button_background"
+        android:text="Pagar con PayPal"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -152,10 +154,11 @@
         android:id="@+id/buttonMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="92dp"
         android:text="Mapa"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

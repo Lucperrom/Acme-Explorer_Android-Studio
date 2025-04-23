@@ -57,7 +57,7 @@ public class ListadoTripActivity extends AppCompatActivity implements TripAdapte
         cardFiltrar = findViewById(R.id.CardFilter);
 
         // Cargar viajes desde SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences(SplashActivity.PREF_NAME, MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = getSharedPreferences(SplashActivity.PREF_NAME, MODE_PRIVATE);
         firebaseDatabaseService = FirebaseDatabaseService.getServiceInstance();
 
         firebaseDatabaseService.getTrip().addListenerForSingleValueEvent(new ValueEventListener() {

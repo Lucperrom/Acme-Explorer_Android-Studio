@@ -76,7 +76,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void pinOrigen(LatLng ubicacion){
         String origen_lat = getIntent().getStringExtra("LAT");
         String origen_lon = getIntent().getStringExtra("LON");
-        if(origen_lat != "" || origen_lon != ""){
+        if(origen_lat != null && !origen_lat.isEmpty() &&
+                origen_lon != null && !origen_lon.isEmpty()){
             double lat = Double.parseDouble(origen_lat);
             double lon = Double.parseDouble(origen_lon);
             LatLng origen = new LatLng(lat, lon);

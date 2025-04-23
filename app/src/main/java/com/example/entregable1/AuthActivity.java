@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.entregable1.entity.Enlace;
 import com.example.entregable1.entity.Trip;
+import com.example.entregable1.entity.User;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -81,9 +82,7 @@ public class AuthActivity extends AppCompatActivity {
                 .build();
 
         signinButtonGoogle.setOnClickListener(l -> attemptLoginGoogle(googleSignInOptions));
-
         siginButtonMail.setOnClickListener(l -> attemptLoginEmail());
-
         loginButtonSingUp.setOnClickListener(l -> redirectSignUpActivity());
 
 
@@ -170,6 +169,22 @@ public class AuthActivity extends AppCompatActivity {
     private void checkUserDatabaseLogin(FirebaseUser user) {
         //Dummy
         //TODO: complete
+        FirestoreService firestoreService = FirestoreService.getServiceInstance();
+        firestoreService.getUser(user.getUid(), (documentSnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("Firestore", "Error checking user", error);
+                        return;
+                    }
+
+                    if (documentSnapshot == null || !documentSnapshot.exists()) {
+                        // El usuario no existe en Firestore, crearlo
+                        User newUser = new User();
+                        newUser.setUid(user.getUid());
+
+                        firestoreService.saveUser(newUser);
+                    }
+                });
+
         Toast.makeText(this, String.format(getString(R.string.login_completed), user.getEmail()), Toast.LENGTH_SHORT).show();
         enlaceAdapter = new EnlaceAdapter(Enlace.generaEnlaces(), this);
         enlaceAdapter.notifyDataSetChanged();
@@ -177,96 +192,17 @@ public class AuthActivity extends AppCompatActivity {
         finish();
 
         firebaseDatabaseService = FirebaseDatabaseService.getServiceInstance();
-
-        firebaseDatabaseService.getTrip("1").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists() && dataSnapshot.getValue() != null){
-                    Trip trip = dataSnapshot.getValue(Trip.class);
-                    Toast.makeText(AuthActivity.this, trip.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
-        if(valueEventListener==null) {
-            valueEventListener = firebaseDatabaseService.getTrip("2").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists() && dataSnapshot.getValue() != null) {
-                        Trip trip = dataSnapshot.getValue(Trip.class);
-                        Log.i("Acme-Explorer", "Elemento modificado individualmente: " + trip.toString());
-                        Toast.makeText(AuthActivity.this, trip.toString(), Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
-        FirestoreService firestoreService = FirestoreService.getServiceInstance();
-        firestoreService.saveTrip(Trip.generaViajes(1).get(0), new OnCompleteListener<DocumentReference>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
-                if (task.isSuccessful()) {
-                    DocumentReference documentReference = task.getResult();
-                    documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if(task.isSuccessful()){
-                                DocumentSnapshot document = task.getResult();
-                                Trip trip = document.toObject(Trip.class);
-                                Log.i("Acme-Explorer", "Firestore almacenamiento feedback" + trip.toString());
-                            }
-                        }
-                    });
-                    Log.i("Acme-Explorer", "Firestore almacenamiento completado" + task.getResult().getId());
-                }else{
-                    Log.i("Acme-Explorer", "Error al almacenar en Firestore");
-                }
-            }
-        });
-
-        firestoreService.getTrips(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    List<Trip> trips = new ArrayList<>();
-                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        Trip trip = document.toObject(Trip.class);
-                        trips.add(trip);
-                    }
-                    Log.i("Acme-Explorer", "Firestore lectura" + trips.toString());
-                }
-            }
-        });
-
-        firestoreService.getTrip("Bu9upCeSTBXsB6B8plOb", new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
-                if(documentSnapshot != null && documentSnapshot.exists()){
-                    Trip trip = documentSnapshot.toObject(Trip.class);
-                    Log.i("Acme-Explorer", "Firestore lectura individual" + trip.toString());
-                }
-            }
-        });
-
         //startActivity(new Intent(this, FirebaseStorageExample.class));
 
     }
 
-    @Override
+   /* @Override
     protected void onPause() {
         super.onPause();
         if(firebaseDatabaseService != null && valueEventListener != null)
             firebaseDatabaseService.getTrip().removeEventListener(valueEventListener);
     }
+    */
 
     private void showErrorEmailVerified(FirebaseUser user) {
         hideLoginButton(false);

@@ -8,15 +8,7 @@ public class CreatePaymentRequest {
     private List<Transaction> transactions;
     private RedirectUrls redirect_urls;
 
-    public CreatePaymentRequest(String intent, Payer payer, List<Transaction> transactions, RedirectUrls redirect_urls) {
-        this.intent = intent;
-        this.payer = payer;
-        this.transactions = transactions;
-        this.redirect_urls = redirect_urls;
-    }
-    public CreatePaymentRequest() {
-    }
-
+    // Getters and Setters
     public String getIntent() {
         return intent;
     }
@@ -49,15 +41,9 @@ public class CreatePaymentRequest {
         this.redirect_urls = redirect_urls;
     }
 
-
+    // Nested classes
     public static class Payer {
         private String payment_method;
-
-        public Payer(String payment_method) {
-            this.payment_method = payment_method;
-        }
-        public Payer() {
-        }
 
         public String getPayment_method() {
             return payment_method;
@@ -71,14 +57,7 @@ public class CreatePaymentRequest {
     public static class Transaction {
         private Amount amount;
         private String description;
-
-        public Transaction(Amount amount, String description) {
-            this.amount = amount;
-            this.description = description;
-        }
-        public Transaction() {
-
-        }
+        private ItemList item_list;
 
         public Amount getAmount() {
             return amount;
@@ -95,19 +74,20 @@ public class CreatePaymentRequest {
         public void setDescription(String description) {
             this.description = description;
         }
+
+        public ItemList getItem_list() {
+            return item_list;
+        }
+
+        public void setItem_list(ItemList item_list) {
+            this.item_list = item_list;
+        }
     }
 
     public static class Amount {
         private String currency;
         private String total;
-
-        public Amount(String currency, String total) {
-            this.currency = currency;
-            this.total = total;
-        }
-        public Amount() {
-
-        }
+        private Details details;
 
         public String getCurrency() {
             return currency;
@@ -124,19 +104,109 @@ public class CreatePaymentRequest {
         public void setTotal(String total) {
             this.total = total;
         }
+
+        public Details getDetails() {
+            return details;
+        }
+
+        public void setDetails(Details details) {
+            this.details = details;
+        }
+    }
+
+    public static class Details {
+        private String subtotal;
+        private String shipping;
+        private String tax;
+
+        public String getSubtotal() {
+            return subtotal;
+        }
+
+        public void setSubtotal(String subtotal) {
+            this.subtotal = subtotal;
+        }
+
+        public String getShipping() {
+            return shipping;
+        }
+
+        public void setShipping(String shipping) {
+            this.shipping = shipping;
+        }
+
+        public String getTax() {
+            return tax;
+        }
+
+        public void setTax(String tax) {
+            this.tax = tax;
+        }
+    }
+
+    public static class ItemList {
+        private List<Item> items;
+
+        public List<Item> getItems() {
+            return items;
+        }
+
+        public void setItems(List<Item> items) {
+            this.items = items;
+        }
+    }
+
+    public static class Item {
+        private String name;
+        private String quantity;
+        private String price;
+        private String currency;
+        private String sku;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(String quantity) {
+            this.quantity = quantity;
+        }
+
+        public String getPrice() {
+            return price;
+        }
+
+        public void setPrice(String price) {
+            this.price = price;
+        }
+
+        public String getCurrency() {
+            return currency;
+        }
+
+        public void setCurrency(String currency) {
+            this.currency = currency;
+        }
+
+        public String getSku() {
+            return sku;
+        }
+
+        public void setSku(String sku) {
+            this.sku = sku;
+        }
     }
 
     public static class RedirectUrls {
         private String return_url;
         private String cancel_url;
-
-        public RedirectUrls(String return_url, String cancel_url) {
-            this.return_url = return_url;
-            this.cancel_url = cancel_url;
-        }
-        public RedirectUrls() {
-
-        }
 
         public String getReturn_url() {
             return return_url;

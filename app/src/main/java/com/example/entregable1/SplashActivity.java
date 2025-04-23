@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        //sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         //todosLosViajes = Trip.generaViajes(1);
         //guardarViajesEnRealTimeDatabase(todosLosViajes);
         // Solo generar y guardar si no está guardado aún

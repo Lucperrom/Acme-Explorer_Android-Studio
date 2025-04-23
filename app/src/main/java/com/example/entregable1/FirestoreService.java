@@ -45,6 +45,15 @@ public class FirestoreService {
     public void getUser(String id, EventListener<DocumentSnapshot> snapshotListener){
         mDatabase.collection("users").document(id).addSnapshotListener(snapshotListener);
     }
+    public void saveUser(User user) {
+        if (user.getUid() == null) return;
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(user.getUid()) // Nunca uses .add()
+                .set(user)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Usuario guardado"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error guardando usuario", e));
+    }
 
 
     public ListenerRegistration getTrips(EventListener<QuerySnapshot> querySnapshotOnCompleteListener){

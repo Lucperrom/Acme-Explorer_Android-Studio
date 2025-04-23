@@ -2,6 +2,7 @@ package com.example.entregable1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -12,8 +13,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.entregable1.entity.User;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -21,6 +27,8 @@ public class SignupActivity extends AppCompatActivity {
     private EditText login_email_et, login_pass_et, login_pass_confirmation_et;
 
     private TextInputLayout login_email, login_pass, login_pass_confirmation;
+    private FirestoreService firestoreService;
+    private FirebaseFirestore mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +59,19 @@ public class SignupActivity extends AppCompatActivity {
                 login_pass.setErrorEnabled(true);
                 login_pass.setError(getString(R.string.signup_error_pass_not_match));
             } else {
-                FirebaseAuth.getInstance().createUserWithEmailAndPassword(login_email_et.getText().toString(), login_pass_et.getText().toString()).addOnCompleteListener(task -> {
+                Task<AuthResult> authResultTask = FirebaseAuth.getInstance().createUserWithEmailAndPassword(login_email_et.getText().toString(), login_pass_et.getText().toString()).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(this, getString(R.string.signup_created), Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(SignupActivity.this, DisponibleSeleccionado.class));
+                        FirebaseUser firebaseUser = task.getResult().getUser();
+// Descomentar y modificar esta sección
+                        User user = new User();
+                        user.setUid(firebaseUser.getUid());
+
+                        // Usar el servicio FirestoreService en lugar de acceder directamente a Firestore
+                        FirestoreService firestoreService = FirestoreService.getServiceInstance();
+                        firestoreService.saveUser(user);
+                        FirebaseAuth.getInstance().signOut();
+                        startActivity(new Intent(SignupActivity.this, AuthActivity.class));
                     } else {
                         Toast.makeText(this, getString(R.string.signup_created_error), Toast.LENGTH_SHORT).show();
                     }

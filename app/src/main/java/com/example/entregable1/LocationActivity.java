@@ -49,14 +49,40 @@ public class LocationActivity extends AppCompatActivity {
         String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
         if(ContextCompat.checkSelfPermission(this, permissions[0]) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
-                Snackbar.make(tvLocation, R.string.location_rationale, Snackbar.LENGTH_LONG).setAction(R.string.location_rationale_ok, view -> {
-                    ActivityCompat.requestPermissions(LocationActivity.this, permissions, PERMISSION_REQUEST_CODE_LOCATION);
-                }).show();
+                Snackbar snackbar = Snackbar.make(tvLocation, R.string.location_rationale, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.location_rationale_ok, view -> {
+                            ActivityCompat.requestPermissions(LocationActivity.this, permissions, PERMISSION_REQUEST_CODE_LOCATION);
+                        });
+
+                snackbar.show();
+
+                // Añadir un tiempo de espera después del cual se continúa sin permisos
+                tvLocation.postDelayed(() -> {
+                    if (!snackbar.isShown()) {
+                        continueWithoutPermissions();
+                    }
+                }, 5000); // 5 segundos de espera
+
             } else {
                 ActivityCompat.requestPermissions(LocationActivity.this, permissions, PERMISSION_REQUEST_CODE_LOCATION);
             }
         }else{
             startLocationUpdates();
+        }
+    }
+
+    private void continueWithoutPermissions() {
+        String salida = getIntent().getStringExtra("SALIDA");
+        if (salida != null) {
+            Intent intent = new Intent(LocationActivity.this, MapsActivity.class);
+            intent.putExtra("SALIDA", salida);
+            // No añadimos LAT, LON ni TEMP
+            startActivity(intent);
+            finish(); // Importante: cerrar esta actividad
+        } else {
+            // Si no hay información de salida, mostrar un error y finalizar
+            Toast.makeText(this, "No hay información de destino", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
